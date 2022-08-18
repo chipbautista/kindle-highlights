@@ -6,12 +6,12 @@ authors = ["chipbautista <chippybautista@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-dagster = "^0.14.1"
-dagit = "^0.14.1"
-pandas = "^1.4.1"
+SQLAlchemy = "^1.4.40"
+alembic = "^1.8.1"
+pandas = "^1.4.3"
+
 
 [tool.poetry.dev-dependencies]
-jupyterlab = "^3.2.9"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
