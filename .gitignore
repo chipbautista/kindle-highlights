@@ -1,3 +1,10 @@
+.DS_Store
+.vscode
+
+# generated tmp folders
+tmp*
+_*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
