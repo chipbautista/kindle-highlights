@@ -1,4 +1,4 @@
-from sqlalchemy.orm import declarative_base
-
-# instantiate one base class to be inherited by all children
-Base = declarative_base()
+from db.base_class import Base
+from src.models.author import Author
+from src.models.book import Book
+from src.models.highlight import Highlight

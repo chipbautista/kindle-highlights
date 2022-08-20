@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.dialects.sqlite import DATETIME
 from sqlalchemy.orm import relationship
-from src.db.base import Base
+from src.db.base_class import Base
 
 
 class Highlight(Base):
@@ -12,4 +12,4 @@ class Highlight(Base):
     datetime = Column(DATETIME, nullable=False)
 
     book_id = Column(Integer, ForeignKey("books.id"))
-    book = relationship("Book", back_populates="books")
+    book = relationship("Book", back_populates="highlights")
