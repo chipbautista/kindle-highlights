@@ -26,6 +26,7 @@ def transform_clippings_to_dataframe(context, clippings_text: str) -> pd.DataFra
 
     docs_df = connect_notes_to_highlights(docs_df)
     docs_df = docs_df[docs_df["type"] == "Highlight"].copy()
+    docs_df = drop_duplicate_highlights(docs_df)
 
     return docs_df
 
@@ -54,11 +55,31 @@ def parse_title_and_author(string: str) -> Tuple[str, str]:
         # author is likely to be the text inside the last parenthesis
         author = findall(r"\(([A-Za-z,\.; ]+)\)", string)[-1]
         title = string.replace(f"({author})", "")
+
+        try:
+            last_name, first_name = author.split(",")
+            author = f"{first_name} {last_name}"
+        except ValueError:
+            pass
+
         return title.strip(), author.strip()
 
     except Exception as e:
         logger.warning(f"Cannot parse title and author from '{string}'. {e}")
         return string, "Unknown"
+
+
+def drop_duplicate_highlights(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop duplicates that are caused by repeated highlighting on Kindle touch screen
+    -- like when you weren't able to select the text you want so you delete the current highlight and try again"""
+    indices = df.index
+    for i, index in enumerate(indices[:-1]):
+        curr_text = df.loc[index, "text"]
+        next_text = df.loc[indices[i + 1], "text"]
+
+        if next_text.startswith(curr_text):
+            df.drop(index=index, inplace=True)
+    return df
 
 
 def connect_notes_to_highlights(docs_df: pd.DataFrame) -> pd.DataFrame:
