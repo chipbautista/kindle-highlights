@@ -9,6 +9,7 @@ class Highlight(Base):
 
     id = Column(Integer, primary_key=True)
     text = Column(String, nullable=False)
+    note = Column(String)
     datetime = Column(DATETIME, nullable=False)
 
     book_id = Column(Integer, ForeignKey("books.id"))
