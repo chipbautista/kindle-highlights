@@ -24,5 +24,7 @@ def show_highlights(highlights_to_display: List[Highlight]) -> None:
         if highlight.note:
             st.markdown(f"*{highlight.note}*")
 
-        st.markdown(f"*{datetime_formatted}*")
+        st.markdown(
+            f'<font color="grey">*{datetime_formatted}*</font>', unsafe_allow_html=True
+        )
         st.markdown("---")
