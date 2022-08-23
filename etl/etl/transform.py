@@ -77,8 +77,9 @@ def drop_duplicate_highlights(df: pd.DataFrame) -> pd.DataFrame:
         curr_text = df.loc[index, "text"]
         next_text = df.loc[indices[i + 1], "text"]
 
-        if next_text.startswith(curr_text):
+        if next_text.startswith(curr_text) or curr_text.startswith(next_text):
             df.drop(index=index, inplace=True)
+
     return df
 
 
