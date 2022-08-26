@@ -12,3 +12,4 @@ class Book(Base):
 
     author_id = Column(Integer, ForeignKey("authors.id"))
     author = relationship("Author", back_populates="books")
+    google_metadata = relationship("Metadata", back_populates="book")
