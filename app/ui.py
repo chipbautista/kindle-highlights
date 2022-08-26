@@ -41,3 +41,6 @@ def show_book_metadata(book):
             st.markdown(f"#### *{metadata.subtitle}*")
             st.markdown(f"Published {metadata.published_date}")
             st.markdown(f"Categories: {metadata.categories}")
+
+        with st.expander("Show synopsis"):
+            st.markdown(metadata.description)
