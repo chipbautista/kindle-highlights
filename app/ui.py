@@ -28,3 +28,16 @@ def show_highlights(highlights_to_display: List[Highlight]) -> None:
             f'<font color="grey">*{datetime_formatted}*</font>', unsafe_allow_html=True
         )
         st.markdown("---")
+
+
+def show_book_metadata(book):
+    if book.google_metadata:
+        metadata = book.google_metadata[0]
+        img_col, metadata_col = st.columns(2)
+        with img_col:
+            st.image(metadata.cover_image)
+        with metadata_col:
+            st.markdown(f"### {metadata.title}")
+            st.markdown(f"#### *{metadata.subtitle}*")
+            st.markdown(f"Published {metadata.published_date}")
+            st.markdown(f"Categories: {metadata.categories}")

@@ -13,17 +13,7 @@ book = books[selected_book_index]
 highlights = book.highlights
 highlights_w_notes = [h for h in highlights if h.note]
 
-if book.google_metadata:
-    metadata = book.google_metadata[0]
-    img_col, metadata_col = st.columns(2)
-    with img_col:
-        st.image(metadata.cover_image)
-    with metadata_col:
-        st.markdown(f"### {metadata.title}")
-        st.markdown(f"#### {metadata.subtitle}")
-        st.markdown(f"Published {metadata.published_date}")
-        st.markdown(f"Categories: {metadata.categories}")
-
+ui.show_book_metadata(book)
 st.write(
     f"{len(book.highlights)} highlights found ({len(highlights_w_notes)} with notes)"
 )
