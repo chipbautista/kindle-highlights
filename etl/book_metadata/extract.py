@@ -28,6 +28,7 @@ def search_books(context, books: List[dict]) -> dict:
 
     search_results = {}
     for book in books:
+
         params = {"q": f"{book['title']}+inauthor:{book['author']}"}
         params.update(BOOK_SEARCH_DEFAULT_PARAMS)
 
@@ -36,7 +37,11 @@ def search_books(context, books: List[dict]) -> dict:
             response = requests.get(url)
             response.raise_for_status()
 
-            search_results[book["id"]] = response.json()
+            search_result = response.json()
+            if search_result["totalItems"] > 0:
+                search_results[book["id"]] = response.json()
+            else:
+                context.log.warning(f"No results found for {book}")
 
         except Exception as e:
             context.log.error(f"Error for {book}: {e}")
@@ -53,28 +58,34 @@ def search_books(context, books: List[dict]) -> dict:
 def get_book_metadata(context, search_results: dict) -> List[dict]:
     book_metadata = []
     for book_id, search_result in search_results.items():
-        # is the first search result always reliable?
-        book = search_result["items"][0]
+        try:
+            # is the first search result always reliable?
+            book = search_result["items"][0]
 
-        required_data = [
-            "title",
-            "authors",
-            "subtitle",
-            "publishedDate",
-            "description",
-            "categories",
-        ]
+            required_data = [
+                "title",
+                "authors",
+                "subtitle",
+                "publishedDate",
+                "description",
+                "categories",
+            ]
 
-        _book_metadata = {
-            "google_book_id": book["id"],
-            "kindle_book_id": book_id,
-            "book_cover_url": book["volumeInfo"]["imageLinks"]["thumbnail"],
-        }
-        _book_metadata.update(
-            {k: v for (k, v) in book["volumeInfo"].items() if k in required_data}
-        )
-        book_metadata.append(_book_metadata)
-        context.log.debug(_book_metadata)
+            _book_metadata = {
+                "google_book_id": book["id"],
+                "kindle_book_id": book_id,
+                "book_cover_url": book["volumeInfo"]["imageLinks"]["thumbnail"],
+            }
+            _book_metadata.update(
+                {k: v for (k, v) in book["volumeInfo"].items() if k in required_data}
+            )
+            book_metadata.append(_book_metadata)
+
+        except Exception as e:
+            context.log.error(
+                f"Error processing book_id={book_id}: {e} \nSearch results: ({search_result})"
+            )
+
     return book_metadata
 
 

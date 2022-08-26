@@ -12,7 +12,6 @@ from etl.book_metadata.extract import (
     get_book_covers_blob,
 )
 
-# from etl.book_metadata.transform import
 from etl.book_metadata.load import insert_book_metadata_to_db
 
 
