@@ -6,7 +6,7 @@ from src.db.base import Author, Book, Highlight
 
 
 @op(required_resource_keys={"db"})
-def insert_to_db(context, df: pd.DataFrame):
+def insert_highlights_to_db(context, df: pd.DataFrame):
     context.log.info(df)
 
     db = context.resources.db
