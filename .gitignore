@@ -1,5 +1,6 @@
 .DS_Store
 .vscode
+.streamlit
 
 # generated tmp folders
 tmp*
