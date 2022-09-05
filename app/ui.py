@@ -2,7 +2,7 @@ from typing import List
 
 import streamlit as st
 
-import ui_utils
+from . import ui_utils
 from src.db.base import Highlight
 
 
