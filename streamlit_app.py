@@ -1,7 +1,7 @@
 import streamlit as st
 
-import ui
-import db_utils
+from app import ui
+from app import db_utils
 
 st.title("My Kindle Highlights")
 
