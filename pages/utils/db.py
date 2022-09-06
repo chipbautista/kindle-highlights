@@ -46,5 +46,6 @@ def search_highlights(query: str) -> List[Highlight]:
     if query:
         db = get_app_db()
         result = db.query(Highlight).filter(Highlight.text.contains(query)).all()
-        return result
+        # to-do: pagination
+        return result[:50]
     return []
