@@ -1,33 +1,15 @@
-from typing import List
-
 import streamlit as st
 
-from . import ui_utils
-from src.db.base import Highlight
+from pages.utils import ui, db
 
 
 def book_selector(books, book_index) -> int:
     selected_book_index = st.selectbox(
         "Select Book",
         book_index,
-        format_func=lambda x: ui_utils.format_book_title(books[x]),
+        format_func=lambda x: ui.format_book_title(books[x]),
     )
     return selected_book_index
-
-
-def show_highlights(highlights_to_display: List[Highlight]) -> None:
-    for i, highlight in enumerate(highlights_to_display):
-        datetime_formatted = ui_utils.format_datetime(highlight.datetime)
-        st.markdown(f"##### #{i + 1}")
-
-        st.markdown(f"{highlight.text}")
-        if highlight.note:
-            st.markdown(f"*{highlight.note}*")
-
-        st.markdown(
-            f'<font color="grey">*{datetime_formatted}*</font>', unsafe_allow_html=True
-        )
-        st.markdown("---")
 
 
 def show_book_metadata(book):
@@ -44,3 +26,25 @@ def show_book_metadata(book):
 
         with st.expander("Show synopsis"):
             st.markdown(metadata.description)
+
+
+st.write("## Book Highlights")
+
+books = db.get_books()
+book_index = list(range(len(books)))
+selected_book_index = book_selector(books, book_index)
+
+book = books[selected_book_index]
+highlights = book.highlights
+highlights_w_notes = [h for h in highlights if h.note]
+
+show_book_metadata(book)
+st.write(
+    f"{len(book.highlights)} highlights found ({len(highlights_w_notes)} with notes)"
+)
+with_notes_only = st.checkbox("Show highlights with notes only", False)
+st.markdown("---")
+
+highlights_to_display = highlights if not with_notes_only else highlights_w_notes
+for i, highlight in enumerate(highlights_to_display):
+    ui.show_highlight(highlight, i)
