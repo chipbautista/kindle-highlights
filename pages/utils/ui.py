@@ -1,12 +1,6 @@
-from typing import List
-
 import streamlit as st
 
-from src.db.base import Highlight, Book
-
-
-def format_book_title(book: Book):
-    return f"{book.title} ({book.author.name})"
+from src.db.base import Highlight
 
 
 def format_datetime(x: str) -> str:

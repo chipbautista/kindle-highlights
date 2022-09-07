@@ -1,13 +1,18 @@
 import streamlit as st
 
+from src.models.book import Book
 from pages.utils import ui, db
+
+
+def format_book_title(book: Book):
+    return f"{book.title} ({book.author.name}) - ({len(book.highlights)})"
 
 
 def book_selector(books, book_index) -> int:
     selected_book_index = st.selectbox(
         "Select Book",
         book_index,
-        format_func=lambda x: ui.format_book_title(books[x]),
+        format_func=lambda x: format_book_title(books[x]),
     )
     return selected_book_index
 
@@ -15,7 +20,7 @@ def book_selector(books, book_index) -> int:
 def show_book_metadata(book):
     if book.google_metadata:
         metadata = book.google_metadata[0]
-        img_col, metadata_col = st.columns(2)
+        img_col, metadata_col = st.columns([1, 3])
         with img_col:
             st.image(metadata.cover_image)
         with metadata_col:
