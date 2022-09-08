@@ -1,5 +1,9 @@
+from datetime import datetime
+
 import streamlit as st
 import pandas as pd
+import numpy as np
+import plotly.express as px
 from plotly_calplot import calplot
 
 from src.db.base import Highlight
@@ -30,16 +34,90 @@ def show_calendar_heatmap(df):
 
     fig = calplot(counts_df, x="date", y="count")
 
+    st.write("---")
     st.write("### How much have I read the past year or so?")
     st.plotly_chart(fig)
 
 
-# def preprocess_datetime_df(df):
-#     df['month'] = df.datetime.dt.month_name()
+def to_ampm(x):
+    if x == 0:
+        return "12 AM"
+    if 0 < x < 12:
+        return f"{x} AM"
+    if x == 12:
+        return "12 PM"
+    else:
+        return f"{x - 12} PM"
+
+
+def get_highlight_stats_per_day_hr(df):
+    df["hour"] = df.datetime.dt.hour
+
+    hrs = list(range(0, 24))
+    hrs_shifted = [int(x) for x in np.roll(hrs, 7)]  # make 7AM to be the 0 in the chart
+    shift_mapping = dict(zip(hrs, hrs_shifted))
+
+    hrs_ampm = [to_ampm(hr) for hr in hrs]
+    ampm_mapping = dict(zip(hrs, hrs_ampm))
+    df["hour_shifted"] = df["hour"].apply(lambda x: shift_mapping[x])
+    df["hour_ampm"] = df["hour"].apply(lambda x: ampm_mapping[x])
+
+    df["day of week"] = df.datetime.dt.dayofweek
+    df["_c"] = 1
+    df["days_since"] = (datetime.now() - df.datetime).dt.days
+    agg_df = (
+        df.groupby(["day of week", "hour_shifted"])
+        .agg({"_c": "sum", "days_since": "mean"})
+        .reset_index()
+        .rename(columns={"_c": "highlights", "days_since": "ave. recency (days)"})
+    )
+    return agg_df, hrs_shifted, hrs_ampm
+
+
+def show_time_scatterplot(df):
+
+    agg_df, hrs_shifted, hrs_ampm = get_highlight_stats_per_day_hr(df)
+    fig = px.scatter(
+        agg_df,
+        x="day of week",
+        y="hour_shifted",
+        size="highlights",
+        color="ave. recency (days)",
+    )
+    yaxis_format = {
+        "title": "",
+        "tickmode": "array",
+        "tickvals": hrs_shifted,
+        "ticktext": hrs_ampm,
+    }
+    xaxis_format = {
+        "title": "",
+        "tickmode": "array",
+        "tickvals": [0, 1, 2, 3, 4, 5, 6],
+        "ticktext": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ],
+    }
+    fig.update_layout(yaxis=yaxis_format, xaxis=xaxis_format)
+
+    st.write("---")
+    st.write("### What time of the day do I read?")
+    st.plotly_chart(fig)
+
+
 st.write("## Reading Time Analysis")
-st.write("Quick visualizations of my reading behavior")
-st.write("*I guess the number of highlights can act as a proxy...*")
+st.write(
+    "Quick visualizations of my reading behavior (with highlight activity acting as a **proxy**)"
+)
 
 df = get_highlight_datetimes()
 
 show_calendar_heatmap(df)
+
+show_time_scatterplot(df)
