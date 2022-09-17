@@ -113,8 +113,15 @@ def show_time_scatterplot(df):
 
 st.write("## Reading Time Analysis")
 st.write(
-    "Quick visualizations of my reading behavior (with highlight activity acting as a **proxy**)"
+    "Quick visualizations of my reading behavior (with highlight activity as a **proxy**)"
 )
+st.write(
+    "\nI admit, I'm not as big of a reader as I want to be. I'm hoping seeing my '''reading activity''' presented like this will motivate me to read more :)"
+)
+st.write(
+    "*Of course, no highlights does not always mean I'm not reading. Maybe the book I'm reading just doesn't have highlight-worthy passages lol*"
+)
+
 
 df = get_highlight_datetimes()
 
