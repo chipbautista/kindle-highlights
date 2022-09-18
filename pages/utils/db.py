@@ -15,7 +15,7 @@ def get_app_db():
     if ENV == "dev":
         db = get_db()
     else:
-        db_file = download_from_s3("db", st.secrets["aws"])
+        db_file = download_from_s3("db")
         db = get_db(db_url=f"sqlite:///{db_file}")
     return db
 
