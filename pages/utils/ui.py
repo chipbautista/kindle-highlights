@@ -7,7 +7,12 @@ def format_datetime(x: str) -> str:
     return x.strftime("%B %d, %Y %I:%M %p")
 
 
-def show_highlight(highlight: Highlight, i: int, show_book_title: bool = False):
+def show_highlight(
+    highlight: Highlight,
+    i: int,
+    show_book_title: bool = False,
+    addtl_metadata: str = "",
+):
     datetime_formatted = format_datetime(highlight.datetime)
     st.markdown(f"##### #{i + 1}")
 
@@ -18,7 +23,8 @@ def show_highlight(highlight: Highlight, i: int, show_book_title: bool = False):
         st.markdown(f"*{highlight.note}*")
 
     st.markdown(
-        f'<font color="grey">*{datetime_formatted}*</font>', unsafe_allow_html=True
+        f'<font color="grey">*{datetime_formatted} {addtl_metadata}*</font>',
+        unsafe_allow_html=True,
     )
     st.markdown("---")
 

@@ -7,7 +7,8 @@ from numpy import ndarray
 from sklearn.manifold import TSNE
 
 from pages.utils.model import get_topic_model
-from pages.utils.ui import show_analysis_note
+from pages.utils.db import get_highlights
+from pages.utils.ui import show_analysis_note, show_highlight
 
 st.set_page_config(layout="wide")
 
@@ -42,7 +43,19 @@ def get_topics_df(model) -> pd.DataFrame:
     docs_2d = project_docs_to_2d(model.document_vectors)
     df["tsne_1"] = docs_2d[:, 0]
     df["tsne_2"] = docs_2d[:, 1]
+
+    df = join_model_output_with_highlights_db(df)
     return df
+
+
+def join_model_output_with_highlights_db(topics_df):
+    highlights = get_highlights()
+    highlights_ = pd.Series(highlights, name="highlight_db_obj")
+    highlights_.index = [h.text for h in highlights]
+
+    topics_df = topics_df.merge(highlights_, left_on="text", right_index=True)
+
+    return topics_df
 
 
 def get_topic_names(model, top_n: int = 5) -> List[str]:
@@ -56,6 +69,23 @@ def project_docs_to_2d(doc_vectors: ndarray) -> ndarray:
     with st.spinner("Projecting documents to 2 dimensions..."):
         tsne = TSNE(init="pca", learning_rate="auto", perplexity=30, random_state=123)
         return tsne.fit_transform(doc_vectors)
+
+
+def show_tsne_plot(df):
+    st.write("### 🗺 All my highlights in Euclidean space")
+    max_score = df["topic_score_min0"].max()
+    min_topic_score = st.slider(
+        "Set minimum topic score",
+        0.00,
+        max_score,
+        value=0.10,
+        step=0.1,
+        format="%.2f",
+    )
+
+    filtered_df = df[df["topic_score_min0"] >= min_topic_score]
+    st.write(f"{len(filtered_df)} out of {len(df)} highlights displayed.")
+    plot_2d_docs(filtered_df)
 
 
 def plot_2d_docs(df):
@@ -99,6 +129,37 @@ def plot_2d_docs(df):
         st.write()
 
 
+def show_top_highlights_per_topic(df):
+    st.write("---")
+    st.write("### 👑 Top highlights per topic")
+
+    topic_col, n_col = st.columns([0.8, 0.2])
+    with topic_col:
+        topic_names = df["topic_name"].unique()
+        selected_topic = st.selectbox("Select topic", topic_names)
+    with n_col:
+        top_n = st.number_input(
+            "n highlights", min_value=1, max_value=20, value=3, step=1
+        )
+
+    if selected_topic:
+        topic_df = (
+            df[df["topic_name"] == selected_topic]
+            .sort_values("topic_score", ascending=False)
+            .reset_index()
+        )
+
+        for i, row in topic_df[:top_n].iterrows():
+            highlight = row["highlight_db_obj"]
+            score = row["topic_score_disp"]
+            show_highlight(
+                highlight,
+                i,
+                show_book_title=True,
+                addtl_metadata=f"| Topic Score: {score}",
+            )
+
+
 st.write("## Highlights by Topic")
 st.write(
     "I thought it would be fun to have a model automatically categorize my highlights for me, so I trained a simple Top2Vec model! This page shows the visualizations from the model output."
@@ -108,5 +169,5 @@ show_analysis_note()
 model = get_topic_model()
 topics_df = get_topics_df(model)
 
-st.write("### All my highlights in Euclidean space")
-plot_2d_docs(topics_df)
+show_tsne_plot(topics_df)
+show_top_highlights_per_topic(topics_df)

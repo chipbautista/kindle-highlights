@@ -26,6 +26,12 @@ def get_books():
     return books
 
 
+def get_highlights() -> List[Highlight]:
+    db = get_app_db()
+    highlights = db.query(Highlight).all()
+    return highlights
+
+
 def search_highlights(query: str) -> List[Highlight]:
     if query:
         db = get_app_db()
