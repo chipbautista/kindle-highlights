@@ -1,5 +1,3 @@
-import _thread
-import weakref
 from typing import List
 
 import pandas as pd
@@ -34,10 +32,6 @@ def get_highlights() -> List[Highlight]:
     return highlights
 
 
-@st.cache(
-    allow_output_mutation=True,
-    hash_funcs={_thread.RLock: lambda _: None, weakref.ReferenceType: lambda _: None},
-)
 def get_highlights_series() -> pd.Series:
     highlights = get_highlights()
     highlights_ = pd.Series(highlights, name="highlight_db_obj")
