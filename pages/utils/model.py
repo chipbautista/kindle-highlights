@@ -22,9 +22,7 @@ TOPIC_MODEL_PATH = st.secrets.get("TOPIC_MODEL")
 def get_topic_model() -> Top2Vec:
     with st.spinner("Loading topic model..."):
         topic_model_path = (
-            TOPIC_MODEL_PATH
-            if ENV == "dev"
-            else download_from_s3("topic_model", st.secrets["aws"])
+            TOPIC_MODEL_PATH if ENV == "dev" else download_from_s3("topic_model")
         )
 
         model = Top2Vec.load(topic_model_path)

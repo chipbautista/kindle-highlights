@@ -36,7 +36,7 @@ def show_calendar_heatmap(df):
     fig = calplot(counts_df, x="date", y="count")
 
     st.write("---")
-    st.write("### How much have I read the past year or so?")
+    st.write("### 🤓 How much have I read the past year or so?")
     st.plotly_chart(fig)
 
 
@@ -105,10 +105,12 @@ def show_time_scatterplot(df):
             "Sunday",
         ],
     }
-    fig.update_layout(yaxis=yaxis_format, xaxis=xaxis_format)
+    fig.update_layout(
+        yaxis=yaxis_format, xaxis=xaxis_format, margin=dict(l=20, r=20, b=20, t=20)
+    )
 
     st.write("---")
-    st.write("### What time of the day do I read?")
+    st.write("### 🕰 What time of the day do I read?")
     st.plotly_chart(fig)
 
 

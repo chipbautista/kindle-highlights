@@ -4,12 +4,12 @@ from numpy import ndarray
 from sklearn.manifold import TSNE
 
 from pages.utils.model import get_topics_df, get_topic_model
-
 from pages.utils.ui import show_analysis_note, show_highlight
 
 st.set_page_config(layout="wide")
 
 
+@st.cache(allow_output_mutation=True)
 def project_docs_to_2d(df, doc_vectors: ndarray) -> ndarray:
     with st.spinner("Projecting documents to 2 dimensions..."):
         tsne = TSNE(init="pca", learning_rate="auto", perplexity=30, random_state=123)
@@ -22,6 +22,8 @@ def project_docs_to_2d(df, doc_vectors: ndarray) -> ndarray:
 
 def show_tsne_plot(df):
     st.write("### 🗺 All my highlights in Euclidean space")
+
+    ### Removing this for now -- runs too slow unless cached tsne works perfectly
     # max_score = df["topic_score_min0"].max()
     # min_topic_score = st.slider(
     #     "Set minimum topic score",

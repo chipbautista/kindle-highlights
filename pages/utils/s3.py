@@ -3,18 +3,18 @@ import streamlit as st
 
 
 @st.cache
-def download_from_s3(file: str, aws_secrets: dict) -> str:
+def download_from_s3(file: str) -> str:
 
     if file == "db":
-        s3_file = aws_secrets["DB_FILE"]
+        s3_file = st.secrets["aws"]["DB_FILE"]
     elif file == "topic_model":
-        s3_file = aws_secrets["TOPIC_MODEL"]
+        s3_file = st.secrets["TOPIC_MODEL"]
 
     s3 = boto3.client(
         "s3",
-        aws_access_key_id=aws_secrets["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=aws_secrets["AWS_SECRET_ACCESS_KEY"],
+        aws_access_key_id=st.secrets["aws"]["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=st.secrets["aws"]["AWS_SECRET_ACCESS_KEY"],
     )
-    s3.download_file(aws_secrets["BUCKET"], s3_file, s3_file)
+    s3.download_file(st.secrets["aws"]["BUCKET"], s3_file, s3_file)
     print("Database downloaded from S3.")
     return s3_file
