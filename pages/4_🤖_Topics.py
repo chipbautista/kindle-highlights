@@ -70,7 +70,7 @@ def plot_2d_docs(df):
             """
             Click on the legend to filter by topic (double-click to select one and deselect everything else).
             
-            The size of the dot indicates the document score. The bigger it is, the more certain that it belongs to the topic :)
+            The size of the dot indicates the document score. The bigger it is, the more certain that it belongs to the topic.
             """
         )
         st.write()
@@ -80,14 +80,16 @@ def show_top_highlights_per_topic(df):
     st.write("---")
     st.write("### 👑 Top highlights per topic")
 
-    topic_col, n_col = st.columns([0.8, 0.2])
+    topic_col, n_col = st.columns([0.6, 0.4])
     with topic_col:
         topic_names = df["topic_name"].unique()
         selected_topic = st.selectbox("Select topic", topic_names)
     with n_col:
         top_n = st.number_input(
-            "n highlights", min_value=1, max_value=20, value=3, step=1
+            "n highlights", min_value=1, max_value=20, value=5, step=1
         )
+
+    st.markdown("---")
 
     if selected_topic:
         topic_df = (
@@ -103,7 +105,8 @@ def show_top_highlights_per_topic(df):
                 highlight,
                 i,
                 show_book_title=True,
-                addtl_metadata=f" | Topic Score: {score}",
+                show_book_image=True,
+                addtl_metadata=f"Topic Score: {score}",
             )
 
 

@@ -60,10 +60,16 @@ def show_results(results, scores: dict = {}):
         st.markdown("---")
         for i, result in enumerate(selected_results):
             score = scores.get(result.text, None)
-            score_string = f" | Score: {score:.2f}" if score else ""
+            score_string = f"Relevance Score: {score:.2f}" if score else ""
 
             result.text = highlight_search_query(result.text)
-            show_highlight(result, i, show_book_title=True, addtl_metadata=score_string)
+            show_highlight(
+                result,
+                i,
+                show_book_title=True,
+                show_book_image=True,
+                addtl_metadata=score_string,
+            )
 
     elif isinstance(results, list) and len(results) == 0:
         st.warning(f"No highlights found for query: {query}")
@@ -72,9 +78,14 @@ def show_results(results, scores: dict = {}):
 text_col, radio_col = st.columns(2)
 query = text_col.text_input(
     "What are you interested in?",
-    help="This will search for the string in the database. Case-insensitive and *not* fuzzy-enabled.",
+    # help="This will search for the string in the database. Case-insensitive and *not* fuzzy-enabled.",
 )
-search_type = radio_col.radio("Search Method", ["Exact", "Semantic"], horizontal=True)
+search_type = radio_col.radio(
+    "Search Method",
+    ["Exact", "Semantic"],
+    horizontal=True,
+    help="**Exact**: Search using case-insensitive substring. **Semantic**: Search by meaning.",
+)
 st.write("---")
 if query:
     if search_type == "Exact":
@@ -82,6 +93,7 @@ if query:
         scores = {}
 
     elif search_type == "Semantic":
-        results, scores = search_semantic(query)
+        with st.spinner("Searching by meaning..."):
+            results, scores = search_semantic(query)
 
     show_results(results, scores)

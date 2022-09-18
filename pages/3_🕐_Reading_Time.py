@@ -11,7 +11,6 @@ from pages.utils.db import get_app_db
 from pages.utils.ui import show_analysis_note
 
 
-# @st.cache
 def get_highlight_datetimes():
     db = get_app_db()
     all_datetime = db.query(Highlight.datetime).all()
