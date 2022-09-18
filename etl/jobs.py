@@ -16,8 +16,8 @@ from etl.book_metadata.extract import (
     get_book_covers_blob,
 )
 from etl.topic_model.extract import get_highlights_in_db
-from etl.topic_model.transform import train_top2vec_model
-from etl.topic_model.load import save_topic_model
+from etl.topic_model.transform import train_top2vec_model, project_docs_to_2d
+from etl.topic_model.load import upload_to_s3
 
 from etl.book_metadata.load import insert_book_metadata_to_db
 
@@ -67,4 +67,9 @@ def get_google_books_metadata():
 def run_topic_modeling():
     highlights = get_highlights_in_db()
     model_path = train_top2vec_model(highlights)
-    save_topic_model(model_path)
+    vectors_path = project_docs_to_2d(model_path)
+
+    # model_path = save_topic_model(model)
+    # vectors_path = save_tsne_vectors(tsne_vectors)
+
+    upload_to_s3(model_path, vectors_path)
