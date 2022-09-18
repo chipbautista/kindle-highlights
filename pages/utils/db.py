@@ -1,31 +1,13 @@
 from typing import List
 
 import streamlit as st
-from dotenv import dotenv_values
 
 from src.db.base import Book, Highlight
 from src.db.session import get_db
 from .s3 import download_from_s3
 
-# import boto3
 
-
-# env = dotenv_values()
 ENV = st.secrets.get("ENV", "dev")
-
-
-# @st.cache
-# def get_db_from_s3(aws_secrets: dict):
-#     s3 = boto3.client(
-#         "s3",
-#         aws_access_key_id=aws_secrets["AWS_ACCESS_KEY_ID"],
-#         aws_secret_access_key=aws_secrets["AWS_SECRET_ACCESS_KEY"],
-#     )
-#     s3.download_file(
-#         aws_secrets["BUCKET"], aws_secrets["DB_FILE"], aws_secrets["DB_FILE"]
-#     )
-#     print("Database downloaded from S3.")
-#     return aws_secrets["DB_FILE"]
 
 
 def get_app_db():
