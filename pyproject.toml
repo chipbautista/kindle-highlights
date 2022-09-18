@@ -5,7 +5,7 @@ description = ""
 authors = ["chipbautista <chippybautista@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8,<3.11"
 SQLAlchemy = "^1.4.40"
 alembic = "1.6.5"
 pandas = "^1.4.3"
@@ -16,11 +16,14 @@ streamlit = "^1.12.0"
 python-dotenv = "^0.21.0"
 boto3 = "^1.24.66"
 plotly-calplot = "^0.1.12"
+joblib = "1.1.0"
+top2vec = {extras = ["sentence_encoders"], version = "^1.0.27"}
 
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
 ipython = "^8.4.0"
+jupyterlab = "^3.4.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
