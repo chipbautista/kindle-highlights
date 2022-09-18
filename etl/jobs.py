@@ -1,3 +1,7 @@
+import os
+
+import boto3
+from dotenv import load_dotenv, find_dotenv
 from sqlalchemy.orm import Session
 from dagster import job, resource
 
@@ -11,8 +15,26 @@ from etl.book_metadata.extract import (
     get_book_metadata,
     get_book_covers_blob,
 )
+from etl.topic_model.extract import get_highlights_in_db
+from etl.topic_model.transform import train_top2vec_model
+from etl.topic_model.load import save_topic_model
 
 from etl.book_metadata.load import insert_book_metadata_to_db
+
+
+@resource
+def get_s3_bucket(init_context) -> Session:
+    try:
+        load_dotenv(find_dotenv())
+        s3 = boto3.resource(
+            "s3",
+            aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID_WRITE"],
+            aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY_WRITE"],
+        )
+        bucket = s3.Bucket(os.environ["S3_BUCKET"])
+        yield bucket
+    finally:
+        pass
 
 
 @resource
@@ -39,3 +61,10 @@ def get_google_books_metadata():
     book_metadata = get_book_covers_blob(book_metadata)
 
     insert_book_metadata_to_db(book_metadata)
+
+
+@job(resource_defs={"db": get_db_session, "s3_bucket": get_s3_bucket})
+def run_topic_modeling():
+    highlights = get_highlights_in_db()
+    model_path = train_top2vec_model(highlights)
+    save_topic_model(model_path)
