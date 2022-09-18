@@ -1,19 +1,15 @@
 import streamlit as st
 import plotly.express as px
 from numpy import ndarray
-from sklearn.manifold import TSNE
 
-from pages.utils.model import get_topics_df, get_topic_model
+from pages.utils.model import get_topics_df, get_topic_model, get_tsne_vectors
 from pages.utils.ui import show_analysis_note, show_highlight
 
 st.set_page_config(layout="wide")
 
 
-@st.cache(allow_output_mutation=True)
-def project_docs_to_2d(df, doc_vectors: ndarray) -> ndarray:
-    with st.spinner("Projecting documents to 2 dimensions..."):
-        tsne = TSNE(init="pca", learning_rate="auto", perplexity=30, random_state=123)
-        docs_2d = tsne.fit_transform(doc_vectors)
+def add_tsne_vectors_to_df(df):
+    docs_2d = get_tsne_vectors()
 
     df["tsne_1"] = docs_2d[:, 0]
     df["tsne_2"] = docs_2d[:, 1]
@@ -24,19 +20,19 @@ def show_tsne_plot(df):
     st.write("### 🗺 All my highlights in Euclidean space")
 
     ### Removing this for now -- runs too slow unless cached tsne works perfectly
-    # max_score = df["topic_score_min0"].max()
-    # min_topic_score = st.slider(
-    #     "Set minimum topic score",
-    #     0.00,
-    #     max_score,
-    #     value=0.10,
-    #     step=0.1,
-    #     format="%.2f",
-    # )
+    max_score = df["topic_score_min0"].max()
+    min_topic_score = st.slider(
+        "Set minimum topic score",
+        0.00,
+        max_score,
+        value=0.10,
+        step=0.1,
+        format="%.2f",
+    )
 
-    # filtered_df = df[df["topic_score_min0"] >= min_topic_score]
-    # st.write(f"{len(filtered_df)} out of {len(df)} highlights displayed.")
-    plot_2d_docs(df)
+    filtered_df = df[df["topic_score_min0"] >= min_topic_score]
+    st.write(f"{len(filtered_df)} out of {len(df)} highlights displayed.")
+    plot_2d_docs(filtered_df)
 
 
 def plot_2d_docs(df):
@@ -119,7 +115,7 @@ show_analysis_note()
 
 model = get_topic_model()
 topics_df = get_topics_df(model)
-topics_df = project_docs_to_2d(topics_df, model.document_vectors)
+topics_df = add_tsne_vectors_to_df(topics_df)
 
 show_tsne_plot(topics_df)
 show_top_highlights_per_topic(topics_df)

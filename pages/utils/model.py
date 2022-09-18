@@ -1,3 +1,4 @@
+import pickle
 import _thread
 import weakref
 
@@ -12,7 +13,6 @@ from pages.utils.s3 import download_from_s3
 from pages.utils.db import get_highlights_series
 
 ENV = st.secrets.get("ENV", "dev")
-TOPIC_MODEL_PATH = st.secrets.get("TOPIC_MODEL")
 
 
 @st.cache(
@@ -21,14 +21,30 @@ TOPIC_MODEL_PATH = st.secrets.get("TOPIC_MODEL")
 )
 def get_topic_model() -> Top2Vec:
     with st.spinner("Loading topic model..."):
-        topic_model_path = (
-            TOPIC_MODEL_PATH if ENV == "dev" else download_from_s3("topic_model")
-        )
+        topic_model_path = st.secrets.get("TOPIC_MODEL")
+        if ENV != "dev":
+            download_from_s3(topic_model_path)
 
         model = Top2Vec.load(topic_model_path)
         print(f"Topic model loaded from {topic_model_path}")
 
     return model
+
+
+@st.cache(
+    allow_output_mutation=True,
+    hash_funcs={_thread.RLock: lambda _: None, weakref.ReferenceType: lambda _: None},
+)
+def get_tsne_vectors():
+    with st.spinner("Loading 2D vectors..."):
+        vectors_path = st.secrets.get("TSNE_VECTORS")
+        if ENV != "dev":
+            download_from_s3(vectors_path)
+
+        with open(vectors_path, "rb") as f:
+            vectors = pickle.load(f)
+        print(f"TSNE vectors loaded from {vectors_path}")
+        return vectors
 
 
 def get_topics_df(model) -> pd.DataFrame:

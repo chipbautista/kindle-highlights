@@ -1,3 +1,5 @@
+import _thread
+import weakref
 from typing import List
 
 import pandas as pd
@@ -15,7 +17,7 @@ def get_app_db():
     if ENV == "dev":
         db = get_db()
     else:
-        db_file = download_from_s3("db")
+        db_file = download_from_s3(st.secrets["aws"]["DB_FILE"])
         db = get_db(db_url=f"sqlite:///{db_file}")
     return db
 
@@ -26,13 +28,16 @@ def get_books():
     return books
 
 
-# @st.cache(allow_output_mutation=True)
 def get_highlights() -> List[Highlight]:
     db = get_app_db()
     highlights = db.query(Highlight).all()
     return highlights
 
 
+@st.cache(
+    allow_output_mutation=True,
+    hash_funcs={_thread.RLock: lambda _: None, weakref.ReferenceType: lambda _: None},
+)
 def get_highlights_series() -> pd.Series:
     highlights = get_highlights()
     highlights_ = pd.Series(highlights, name="highlight_db_obj")
