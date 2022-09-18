@@ -7,6 +7,7 @@ import pandas as pd
 from src.models.highlight import Highlight
 from pages.utils.db import search_highlights
 from pages.utils.ui import show_highlight
+from pages.utils.model import search_semantic
 
 
 st.write("## Highlight Search")
@@ -47,9 +48,9 @@ def filter_results_by_book(
     )
 
 
-def show_results(results):
-    st.write("### Search Results")
-    if results:
+def show_results(results, scores: dict = {}):
+    if len(results) > 0:
+        st.write("### Search Results")
         n_books = len(set([r.book.title for r in results]))
         st.success(f"{len(results)} highlights found from {n_books} books.")
 
@@ -58,22 +59,29 @@ def show_results(results):
 
         st.markdown("---")
         for i, result in enumerate(selected_results):
+            score = scores.get(result.text, None)
+            score_string = f" | Score: {score:.2f}" if score else ""
+
             result.text = highlight_search_query(result.text)
-            show_highlight(result, i, show_book_title=True)
+            show_highlight(result, i, show_book_title=True, addtl_metadata=score_string)
 
     elif isinstance(results, list) and len(results) == 0:
         st.warning(f"No highlights found for query: {query}")
 
 
-col, _ = st.columns(2)
-query = col.text_input(
+text_col, radio_col = st.columns(2)
+query = text_col.text_input(
     "What are you interested in?",
     help="This will search for the string in the database. Case-insensitive and *not* fuzzy-enabled.",
 )
+search_type = radio_col.radio("Search Method", ["Exact", "Semantic"], horizontal=True)
 st.write("---")
 if query:
-    results = search_highlights(query)
-else:
-    results = None
+    if search_type == "Exact":
+        results = search_highlights(query)
+        scores = {}
 
-show_results(results)
+    elif search_type == "Semantic":
+        results, scores = search_semantic(query)
+
+    show_results(results, scores)

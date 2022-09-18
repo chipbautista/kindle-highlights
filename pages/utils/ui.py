@@ -23,7 +23,7 @@ def show_highlight(
         st.markdown(f"*{highlight.note}*")
 
     st.markdown(
-        f'<font color="grey">*{datetime_formatted} {addtl_metadata}*</font>',
+        f'<font color="grey">*{datetime_formatted}{addtl_metadata}*</font>',
         unsafe_allow_html=True,
     )
     st.markdown("---")

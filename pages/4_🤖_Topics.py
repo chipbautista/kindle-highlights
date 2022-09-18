@@ -1,91 +1,40 @@
-from typing import List
-
 import streamlit as st
-import pandas as pd
 import plotly.express as px
 from numpy import ndarray
 from sklearn.manifold import TSNE
 
-from pages.utils.model import get_topic_model
-from pages.utils.db import get_highlights
+from pages.utils.model import get_topics_df, get_topic_model
+
 from pages.utils.ui import show_analysis_note, show_highlight
 
 st.set_page_config(layout="wide")
 
 
-def get_topics_df(model) -> pd.DataFrame:
-    (
-        doc_topics,
-        doc_topic_scores,
-        _,
-        _,
-    ) = model.get_documents_topics(model.document_ids)
-    topic_names = get_topic_names(model)
-
-    df = pd.DataFrame(
-        zip(
-            doc_topics,
-            doc_topic_scores,
-        ),
-        columns=["topic", "topic_score"],
-    )
-
-    df["topic_name"] = df["topic"].apply(lambda x: topic_names[x])
-    df["text"] = model.documents
-
-    df["text_wrap"] = df["text"].str.wrap(80).str.replace("\n", "<br>")
-
-    # remove negative score
-    df["topic_score_min0"] = df["topic_score"].apply(lambda x: x if x >= 0 else 0)
-    # simplify for display in plot
-    df["topic_score_disp"] = df["topic_score"].round(1).astype(str)
-
-    docs_2d = project_docs_to_2d(model.document_vectors)
-    df["tsne_1"] = docs_2d[:, 0]
-    df["tsne_2"] = docs_2d[:, 1]
-
-    df = join_model_output_with_highlights_db(df)
-    return df
-
-
-def join_model_output_with_highlights_db(topics_df):
-    highlights = get_highlights()
-    highlights_ = pd.Series(highlights, name="highlight_db_obj")
-    highlights_.index = [h.text for h in highlights]
-
-    topics_df = topics_df.merge(highlights_, left_on="text", right_index=True)
-
-    return topics_df
-
-
-def get_topic_names(model, top_n: int = 5) -> List[str]:
-    topic_words, _, _ = model.get_topics()
-    topic_names = [", ".join(words[:top_n]) for words in topic_words]
-    return topic_names
-
-
-@st.cache
-def project_docs_to_2d(doc_vectors: ndarray) -> ndarray:
+def project_docs_to_2d(df, doc_vectors: ndarray) -> ndarray:
     with st.spinner("Projecting documents to 2 dimensions..."):
         tsne = TSNE(init="pca", learning_rate="auto", perplexity=30, random_state=123)
-        return tsne.fit_transform(doc_vectors)
+        docs_2d = tsne.fit_transform(doc_vectors)
+
+    df["tsne_1"] = docs_2d[:, 0]
+    df["tsne_2"] = docs_2d[:, 1]
+    return df
 
 
 def show_tsne_plot(df):
     st.write("### 🗺 All my highlights in Euclidean space")
-    max_score = df["topic_score_min0"].max()
-    min_topic_score = st.slider(
-        "Set minimum topic score",
-        0.00,
-        max_score,
-        value=0.10,
-        step=0.1,
-        format="%.2f",
-    )
+    # max_score = df["topic_score_min0"].max()
+    # min_topic_score = st.slider(
+    #     "Set minimum topic score",
+    #     0.00,
+    #     max_score,
+    #     value=0.10,
+    #     step=0.1,
+    #     format="%.2f",
+    # )
 
-    filtered_df = df[df["topic_score_min0"] >= min_topic_score]
-    st.write(f"{len(filtered_df)} out of {len(df)} highlights displayed.")
-    plot_2d_docs(filtered_df)
+    # filtered_df = df[df["topic_score_min0"] >= min_topic_score]
+    # st.write(f"{len(filtered_df)} out of {len(df)} highlights displayed.")
+    plot_2d_docs(df)
 
 
 def plot_2d_docs(df):
@@ -156,7 +105,7 @@ def show_top_highlights_per_topic(df):
                 highlight,
                 i,
                 show_book_title=True,
-                addtl_metadata=f"| Topic Score: {score}",
+                addtl_metadata=f" | Topic Score: {score}",
             )
 
 
@@ -168,6 +117,7 @@ show_analysis_note()
 
 model = get_topic_model()
 topics_df = get_topics_df(model)
+topics_df = project_docs_to_2d(topics_df, model.document_vectors)
 
 show_tsne_plot(topics_df)
 show_top_highlights_per_topic(topics_df)

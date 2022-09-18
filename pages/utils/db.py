@@ -1,5 +1,6 @@
 from typing import List
 
+import pandas as pd
 import streamlit as st
 
 from src.db.base import Book, Highlight
@@ -19,17 +20,24 @@ def get_app_db():
     return db
 
 
-# @st.cache -- cached outputs will be detached objects from DB
 def get_books():
     db = get_app_db()
     books = db.query(Book).all()
     return books
 
 
+# @st.cache(allow_output_mutation=True)
 def get_highlights() -> List[Highlight]:
     db = get_app_db()
     highlights = db.query(Highlight).all()
     return highlights
+
+
+def get_highlights_series() -> pd.Series:
+    highlights = get_highlights()
+    highlights_ = pd.Series(highlights, name="highlight_db_obj")
+    highlights_.index = [h.text for h in highlights]
+    return highlights_
 
 
 def search_highlights(query: str) -> List[Highlight]:
