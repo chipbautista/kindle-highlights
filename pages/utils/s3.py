@@ -2,7 +2,6 @@ import boto3
 import streamlit as st
 
 
-@st.cache
 def download_from_s3(file: str) -> str:
 
     if file == "db":
