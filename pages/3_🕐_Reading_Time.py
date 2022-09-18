@@ -8,6 +8,7 @@ from plotly_calplot import calplot
 
 from src.db.base import Highlight
 from pages.utils.db import get_app_db
+from pages.utils.ui import show_analysis_note
 
 
 # @st.cache
@@ -121,6 +122,8 @@ st.write(
 st.write(
     "*Of course, no highlights does not always mean I'm not reading. Maybe the book I'm reading just doesn't have highlight-worthy passages lol*"
 )
+
+show_analysis_note()
 
 
 df = get_highlight_datetimes()

@@ -8,6 +8,7 @@ from src.models.highlight import Highlight
 from pages.utils.db import search_highlights
 from pages.utils.ui import show_highlight
 
+
 st.write("## Highlight Search")
 
 
@@ -29,7 +30,7 @@ def show_book_selector(results: List[Highlight]) -> Set[str]:
     books = pd.Series([r.book.title for r in results])
     book_result_count = books.value_counts()
     selected_books = st.multiselect(
-        "Select Books",
+        "Filter by book",
         book_result_count.index,
         format_func=lambda x: format_book_num_results(x, book_result_count),
     )
@@ -47,8 +48,10 @@ def filter_results_by_book(
 
 
 def show_results(results):
+    st.write("### Search Results")
     if results:
-        st.success(f"{len(results)} highlights found.")
+        n_books = len(set([r.book.title for r in results]))
+        st.success(f"{len(results)} highlights found from {n_books} books.")
 
         selected_books = show_book_selector(results)
         selected_results = filter_results_by_book(results, selected_books)
@@ -62,7 +65,12 @@ def show_results(results):
         st.warning(f"No highlights found for query: {query}")
 
 
-query = st.text_input("Search String")
+col, _ = st.columns(2)
+query = col.text_input(
+    "What are you interested in?",
+    help="This will search for the string in the database. Case-insensitive and *not* fuzzy-enabled.",
+)
+st.write("---")
 if query:
     results = search_highlights(query)
 else:
