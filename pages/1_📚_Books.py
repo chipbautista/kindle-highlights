@@ -57,7 +57,7 @@ if selected_book_index != "":
     with_notes_only = col2.checkbox(
         "Show highlights with notes only",
         False,
-        help="I sometimes annotate the highlights!",
+        help="I sometimes write notes to go with the highlights!",
     )
     st.markdown("---")
 
