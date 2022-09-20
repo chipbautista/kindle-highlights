@@ -4,15 +4,23 @@ from src.db.base import Highlight
 
 
 def set_custom_font():
-    streamlit_style = """
-                <style>
-                @import url('http://fonts.googleapis.com/css?family=Aboreto');
 
-                h1, h2, h3, h4, h5, div[data-testid="stSidebarNav"] {
-                    font-family: 'Aboreto', serif !important;
-                }
-                </style>
-                """
+    with open("pages/utils/Aboreto-base64.txt", "r") as f:
+        aboreto_base64 = f.read()
+
+    streamlit_style = f"""
+    <style>
+    
+    @font-face {{
+        font-family: 'Aboreto-Regular';
+        src: url(data:font/truetype;charset=utf-8;base64,{aboreto_base64}) format('truetype');  
+    }}
+
+    h1, h2, h3, h4, h5, div[data-testid="stSidebarNav"] {{
+        font-family: 'Aboreto-Regular', serif;
+    }}
+    </style>
+    """
     st.markdown(streamlit_style, unsafe_allow_html=True)
 
 
