@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy import func
 
-from src.db.base import Book, Highlight
+from src.db.base import Book, Highlight, Metadata
 from src.db.session import get_db
 from .s3 import download_from_s3
 
@@ -21,6 +21,14 @@ def get_app_db():
     return db
 
 
+def get_categories(db=None):
+    if db is None:
+        db = get_app_db()
+    categories = db.query(Metadata.categories).distinct().all()
+    categories = [c[0] for c in categories if c[0]]
+    return categories
+
+
 def get_books():
     db = get_app_db()
     books = db.query(Book).all()
@@ -28,8 +36,12 @@ def get_books():
 
 
 def get_highlights(
-    sort_by_recency: bool = False, date_range: tuple = (), with_notes_only: bool = False
+    sort_by_recency: bool = False,
+    date_range: tuple = (),
+    with_notes_only: bool = False,
+    selected_categories: List = [],
 ) -> List[Highlight]:
+
     db = get_app_db()
     query = db.query(Highlight)
 
@@ -43,6 +55,13 @@ def get_highlights(
 
     if with_notes_only:
         query = query.filter(Highlight.note.isnot(None))
+
+    if selected_categories:
+        query = (
+            query.join(Highlight.book)
+            .join(Book.google_metadata)
+            .filter(Metadata.categories.in_(selected_categories))
+        )
 
     if sort_by_recency:
         query = query.order_by(Highlight.datetime.desc())
