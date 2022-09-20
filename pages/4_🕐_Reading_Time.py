@@ -8,9 +8,10 @@ from plotly_calplot import calplot
 
 from src.db.base import Highlight
 from pages.utils.db import get_app_db
-from pages.utils.ui import show_analysis_note, set_custom_font
+from pages.utils.ui import show_analysis_note, set_page_config, set_custom_css
 
-set_custom_font()
+set_page_config()
+set_custom_css()
 
 
 def get_highlight_datetimes():

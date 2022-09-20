@@ -3,7 +3,8 @@ import streamlit as st
 from src.models.book import Book
 from pages.utils import ui, db
 
-ui.set_custom_font()
+ui.set_page_config()
+ui.set_custom_css()
 
 
 def format_book_title(book: Book):

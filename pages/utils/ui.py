@@ -3,7 +3,13 @@ import streamlit as st
 from src.db.base import Highlight
 
 
-def set_custom_font():
+def set_page_config(layout: str = "centered"):
+    st.set_page_config(
+        page_title="Chip's Book Highlights", page_icon="📖", layout=layout
+    )
+
+
+def set_custom_css():
 
     with open("pages/utils/Aboreto-base64.txt", "r") as f:
         aboreto_base64 = f.read()
