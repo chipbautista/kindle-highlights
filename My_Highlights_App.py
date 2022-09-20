@@ -1,12 +1,13 @@
 import streamlit as st
 
 from pages.utils.db import get_highlights, get_min_max_highlight_dates, get_categories
-from pages.utils.ui import show_highlight
+from pages.utils.ui import show_highlight, set_custom_font
 
 st.set_page_config(
     page_title="Chip's Book Highlights",
     page_icon="👋",
 )
+set_custom_font()
 
 
 def reset_page():

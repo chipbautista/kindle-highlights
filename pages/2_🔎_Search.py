@@ -6,9 +6,10 @@ import pandas as pd
 
 from src.models.highlight import Highlight
 from pages.utils.db import search_highlights
-from pages.utils.ui import show_highlight
+from pages.utils.ui import show_highlight, set_custom_font
 from pages.utils.model import search_semantic
 
+set_custom_font()
 
 st.write("## Highlight Search")
 

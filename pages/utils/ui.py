@@ -3,6 +3,19 @@ import streamlit as st
 from src.db.base import Highlight
 
 
+def set_custom_font():
+    streamlit_style = """
+                <style>
+                @import url('http://fonts.googleapis.com/css?family=Aboreto');
+
+                h1, h2, h3, h4, h5, div[data-testid="stSidebarNav"] {
+                    font-family: 'Aboreto', serif !important;
+                }
+                </style>
+                """
+    st.markdown(streamlit_style, unsafe_allow_html=True)
+
+
 def format_datetime(x: str) -> str:
     return x.strftime("%B %d, %Y %I:%M %p")
 
@@ -15,7 +28,7 @@ def show_highlight(
     addtl_metadata: str = "",
 ):
     def show_highlight_and_metadata():
-        st.markdown(f"##### #{i + 1}")
+        st.markdown(f"#### #{i + 1}")
         st.caption(f"{datetime_formatted}{addtl_metadata}")
         st.markdown(f"{highlight.text}", unsafe_allow_html=True)
         if highlight.note:

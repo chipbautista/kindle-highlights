@@ -3,6 +3,8 @@ import streamlit as st
 from src.models.book import Book
 from pages.utils import ui, db
 
+ui.set_custom_font()
+
 
 def format_book_title(book: Book):
     return f"{book.title} ({book.author.name}) - ({len(book.highlights)})"
@@ -27,7 +29,7 @@ def show_book_metadata(book):
         with metadata_col:
             st.markdown(f"### {metadata.title}")
             if metadata.subtitle:
-                st.markdown(f"#### *{metadata.subtitle}*")
+                st.markdown(f"##### {metadata.subtitle}")
             st.markdown(f"by {book.author.name}")
 
             st.caption(f"Published {metadata.published_date}")

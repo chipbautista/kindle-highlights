@@ -1,11 +1,11 @@
 import streamlit as st
 import plotly.express as px
-from numpy import ndarray
 
 from pages.utils.model import get_topics_df, get_topic_model, get_tsne_vectors
-from pages.utils.ui import show_analysis_note, show_highlight
+from pages.utils.ui import show_analysis_note, show_highlight, set_custom_font
 
 st.set_page_config(layout="wide")
+set_custom_font()
 
 
 def add_tsne_vectors_to_df(df):
