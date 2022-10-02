@@ -25,9 +25,9 @@ Run **`make init`** to initialize a `highlights.db` file and create a `clippings
 Afterwards, copy your `My Clippings.txt` file to the created folder.
 
 ### Env variables and secrets
-Setup your keys by creating a `.env` file. See `.env.example` for the variables.
+Setup **env variables**: creating a `.env` file. See `.env.example` for the variables.
 
-Setup Streamlit secrets: editing the `.secrets.toml.example` file, then move and rename it to `.streamlit/secrets.toml`
+Setup **Streamlit secrets**: editing the `.secrets.toml.example` file, then move and rename it to `.streamlit/secrets.toml`
 
 ### For deployment
 Deploying an app additionally requires the ff.:
@@ -52,8 +52,6 @@ There are three pipelines:
 ### Using dagit
 Run `dagit -f etl/jobs.py`.
 By default, this will open up the server on http://localhost:3000.
-
-Note that for pipeline #1, dagit
 
 ❗️ The above pipelines should be run in order.
 
