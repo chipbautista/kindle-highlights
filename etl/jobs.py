@@ -15,11 +15,13 @@ from etl.book_metadata.extract import (
     get_book_metadata,
     get_book_covers_blob,
 )
+from etl.book_metadata.load import (
+    insert_book_metadata_to_db,
+    upload_highlights_db_to_s3,
+)
 from etl.topic_model.extract import get_highlights_in_db
 from etl.topic_model.transform import train_top2vec_model, project_docs_to_2d
-from etl.topic_model.load import upload_to_s3
-
-from etl.book_metadata.load import insert_book_metadata_to_db
+from etl.topic_model.load import upload_topic_model_to_s3
 
 
 @resource
@@ -53,14 +55,16 @@ def import_kindle_clippings():
     insert_highlights_to_db(highlights_df)
 
 
-@job(resource_defs={"db": get_db_session})
+@job(resource_defs={"db": get_db_session, "s3_bucket": get_s3_bucket})
 def get_google_books_metadata():
     books_in_db = get_books_in_db()
     books_search_results = search_books(books_in_db)
     book_metadata = get_book_metadata(books_search_results)
     book_metadata = get_book_covers_blob(book_metadata)
 
-    insert_book_metadata_to_db(book_metadata)
+    _ = insert_book_metadata_to_db(book_metadata)
+
+    upload_highlights_db_to_s3(_)
 
 
 @job(resource_defs={"db": get_db_session, "s3_bucket": get_s3_bucket})
@@ -72,4 +76,4 @@ def run_topic_modeling():
     # model_path = save_topic_model(model)
     # vectors_path = save_tsne_vectors(tsne_vectors)
 
-    upload_to_s3(model_path, vectors_path)
+    upload_topic_model_to_s3(model_path, vectors_path)

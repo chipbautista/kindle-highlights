@@ -25,7 +25,7 @@ def save_tsne_vectors(context, tsne_vectors):
     config_schema={"upload_to_s3": Field(bool, default_value=False)},
     required_resource_keys={"s3_bucket"},
 )
-def upload_to_s3(context, model_path: str, vectors_path: str):
+def upload_topic_model_to_s3(context, model_path: str, vectors_path: str):
     if not context.op_config["upload_to_s3"]:
         context.log.info(f"Skipping S3 upload")
         return

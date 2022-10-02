@@ -49,7 +49,7 @@ def search_books(context, books: List[dict]) -> dict:
         time.sleep(1)
 
     if not search_results:
-        raise Exception(f"No search results found for {len(books)} books")
+        raise Exception(f"No search results found for all {len(books)} books")
 
     return search_results
 

@@ -1,12 +1,9 @@
-from re import search
-
-import pandas as pd
-from dagster import op
+from dagster import op, Field
 
 from .utils import get_latest_clippings_file
 
 
-@op(config_schema={"clippings_file": str})
+@op(config_schema={"clippings_file": Field(str, default_value="")})
 def read_clippings(context) -> str:
     clippings_file = context.op_config["clippings_file"] or get_latest_clippings_file()
     context.log.info(f"Clippings file to process: '{clippings_file}'")
